@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link href="bootstrap-4.3.1-dist/css/bootstrap.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <title>The Film Foyer</title>
@@ -14,11 +14,10 @@
         }
 
         .panels {
-            width: 30%;
         }
         .sidebars {
             width: 5%;
-            height: -webkit-fill-available;
+            height: 70vh;
             
         }
         .sidebars:hover {
@@ -42,7 +41,7 @@
             position: absolute;
             font-size: 15px;
             width: 30%;
-            height: 30%;
+            bottom: 200px;
             z-index: 2;
             color: white;
             opacity: 0;
@@ -52,67 +51,85 @@
             z-index: 3;
             opacity: 0;
         }
+
+        #movie_card_holder {
+            height: 70vh;
+        }
         
     </style>
 </head>
 <body>
-    <div class="d-flex justify-content-center align-items-center">
-        <div class="sidebars d-flex justify-content-center align-items-center"><h1 class="sidebar-text"><</h1></div>
-        <div id="panel_a" class="panels d-flex align-items-end">
-            <p id="text_a" class="text-block p-2"></p>
-            <div class="position-absolute p-2 buttons" id="buttons_a">
-                <p class="d-inline-block btn btn-outline-light">Childrens Ticket: $5.99</p>
-                <p class="d-inline-block btn btn-outline-light">Adults Ticket: $8.99</p>
-            </div>
-            <img id="image_a" class="panel-image w-100" src="http://image.tmdb.org/t/p/w500/">          
-        </div>
-        <div id="panel_b" class="panels d-flex align-items-end">
-            <p id="text_b" class="text-block p-2"></p>
-            <div class="position-absolute p-2 buttons" id="buttons_b">
-                <p class="d-inline-block btn btn-outline-light">Childrens Ticket: $5.99</p>
-                <p class="d-inline-block btn btn-outline-light">Adults Ticket: $8.99</p>
-            </div>
-            <img id="image_b" class="w-100" src="http://image.tmdb.org/t/p/w500/">
-        </div>
-        <div id="panel_c" class="panels d-flex align-items-end">
-            <p id="text_c" class="text-block p-2"></p>
-            <div class="position-absolute p-2 buttons" id="buttons_c">
-                <p class="d-inline-block btn btn-outline-light">Childrens Ticket: $5.99</p>
-                <p class="d-inline-block btn btn-outline-light">Adults Ticket: $8.99</p>
-            </div>
-            <img id="image_c" class="w-100" src="http://image.tmdb.org/t/p/w500/">
-        </div>
-        <div class="sidebars d-flex justify-content-center align-items-center"><h1 class="sidebar-text">></h1></div>
-    </div>
     <div id="app">
-        
+        <div class="w-100">
+            <h1 class="text-center w-100">Fairway Foyer Films</h1>
+        </div>
+        <div class="d-flex justify-content-center align-items-center">
+
+
+            <div class="sidebars d-flex justify-content-center align-items-center" id="previous_button" v-on:click="previousSetOfMovies()"><h1 class="sidebar-text"><</h1></div>
+
+            <div id="movie_card_holder" v-for="movie in currentMovies">
+                <div v-on:mouseover="mouseoverMovieCard($event)" id="panel_a" class="panels d-flex align-items-end">
+                    <p id="text_a" class="text-block p-2" v-bind:value="movie.overview" v-on:mouseover="mouseoverMovieCard($event)"></p>
+                    <div class="position-absolute p-2 buttons" id="buttons_a">
+                        <p class="d-inline-block btn btn-outline-light">Childrens Ticket: $5.99</p>
+                        <p class="d-inline-block btn btn-outline-light">Adults Ticket: $8.99</p>
+                    </div>
+                    <img id="image_a" class="panel-image w-100" v-bind:src="'http://image.tmdb.org/t/p/w500' + movie.poster_path">        
+                </div>
+            </div>
+
+            <div class="sidebars d-flex justify-content-center align-items-center" id="next_button" v-on:click="nextSetOfMovies()"><h1 class="sidebar-text">></h1></div>
+
+
+        </div>        
     </div>
     <script>
         const app = new Vue({
                 el: "#app",
                 data: {
-
+                    currentMovies: [],
+                    currentMoviesOffset: 0
                 },
                 methods: {
-
+                    mouseoverMovieCard(movieCardId) {
+                        console.log(movieCardId.currentTarget.id)
+                    },
+                    previousSetOfMovies() {
+                        if (this.currentMoviesOffset > 0) {
+                            this.currentMoviesOffset -= 3
+                            this.currentMovies = movies.responseJSON.results.slice(this.currentMoviesOffset, this.currentMoviesOffset+3);
+                        }
+                    },
+                    nextSetOfMovies() {
+                        if (this.currentMoviesOffset + 3 < movies.responseJSON.results.length) {
+                            this.currentMoviesOffset += 3
+                            this.currentMovies = movies.responseJSON.results.slice(this.currentMoviesOffset, this.currentMoviesOffset+3);
+                        }
+                        
+                    }
                 }
-
         });
+        console.log(app._data.currentMovies)
+        var movieCardIds = [
+            ["panel_a", "panel_b", "panel_c"],
+            ["image_a", "image_b", "image_c"],
+            ["text_a", "text_b", "text_c"],
+            ["buttons_a", "buttons_b", "buttons_c"]
+        ]
         var request = "https://api.themoviedb.org/3/movie/76341?api_key=2adc1efea60bd3eefc285c12532c4ce8/discover/movie?primary_release_date.gte=2014-09-15&primary_release_date.lte=2014-10-22"
         request = "https://api.themoviedb.org/3/movie/now_playing?api_key=2adc1efea60bd3eefc285c12532c4ce8&language=en-US&page=1"
-        var fetchData = $.get(request, function(response) {
-            console.log(response)
-            document.getElementById("image_a").src = "http://image.tmdb.org/t/p/w500/" + response.results[0].poster_path;
-            document.getElementById("text_a").innerHTML = response.results[0].overview;
-            document.getElementById("image_b").src = "http://image.tmdb.org/t/p/w500/" + response.results[1].poster_path;
-            document.getElementById("text_b").innerHTML = response.results[1].overview;
-            document.getElementById("image_c").src = "http://image.tmdb.org/t/p/w500/" + response.results[2].poster_path;
-            document.getElementById("text_c").innerHTML = response.results[2].overview;
-            request2 = `https://api.themoviedb.org/3/movie/${response.results[1].id}/images?api_key=2adc1efea60bd3eefc285c12532c4ce8`
-            var fetchData = $.get(request2, function(response) {
-                console.log(response)
-            });
+        var movies = $.get(request, function(response) {
+            $("#image_a").attr("src","http://image.tmdb.org/t/p/w500/" + response.results[0].poster_path);
+            $("#text_a").text(response.results[0].overview);
+            $("#image_b").attr("src","http://image.tmdb.org/t/p/w500/" + response.results[1].poster_path);
+            $("#text_b").text(response.results[1].overview);
+            $("#image_c").attr("src","http://image.tmdb.org/t/p/w500/" + response.results[2].poster_path);
+            $("#text_c").text(response.results[2].overview);
+            app._data.currentMovies = response.results.slice(0,3);
+            console.log(app._data.currentMovies)
         });
+
 
         $("#panel_a").mouseenter(function(){
             $("#image_a").animate({

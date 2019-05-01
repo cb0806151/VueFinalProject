@@ -14,10 +14,11 @@
         }
 
         .panels {
+            width: 20%;
         }
         .sidebars {
             width: 5%;
-            height: 70vh;
+            color: gray;
             
         }
         .sidebars:hover {
@@ -39,61 +40,209 @@
 
         .text-block {
             position: absolute;
-            font-size: 15px;
-            width: 30%;
-            bottom: 200px;
+            font-size: 0.8vw;
+            width: 20%;
+            top: 30vh;
             z-index: 2;
             color: white;
             opacity: 0;
         }
 
+        .text-block-header {
+            position: absolute;
+            font-size: 0.8vw;
+            width: 20%;
+            top: 28vh;
+            z-index: 2;
+            color: white;
+            opacity: 0;
+            font-weight: bold;
+        }
+
         .buttons {
+            font-size: 0.8vw;
             z-index: 3;
             opacity: 0;
         }
 
         #movie_card_holder {
-            height: 70vh;
+            margin: auto;
+            width: 70vw;
+        }
+
+        #navbar {
+            border-bottom: black 10px dotted;
+        }
+
+        #footer {
+            height: 90px;
+        }
+
+        #ticket_top {
+            background: black;
+            height: 30px;
+            border-radius: 40%;
+            position: relative;
+            top: -15px;
+        }
+
+        #ticket_bottom {
+            background: black;
+            height: 30px;
+            border-radius: 40%;
+            position: relative;
+            top: 87%;
+        }
+
+        #app {
+            max-height: 90vh;
+        }
+
+        #checkout_tab {
+            width: 90px;
+            height: 40px;
+            background: #b38f00;
+            right: 30px;
+        }
+
+        #checkout_tab_arrow {
+            background: transparent;
+            right: 30px;
+            border-width: 45px 45px 45px 45px;
+            border-style: solid;
+            border-color: #b38f00 transparent transparent transparent;
+            top: 8px;
+            transform: scaleY(0.3);
+        }
+
+        #checkout_summary_container {
+            z-index: 5;
+            background: #b38f00;
         }
         
     </style>
 </head>
 <body>
     <div id="app">
-        <div class="w-100">
-            <h1 class="text-center w-100">Fairway Foyer Films</h1>
+        <div id="checkout_tab_container"
+             v-on:mouseover="hoverCheckoutTab('#ffcc00')" 
+             v-on:mouseleave="hoverCheckoutTab('#b38f00')" >
+            <div id="checkout_tab" class="position-absolute d-flex justify-content-center align-items-center">
+                <p class="text-light">Checkout</p>
+            </div>
+            <div id="checkout_tab_arrow" class="position-absolute"></div>
         </div>
-        <div class="d-flex justify-content-center align-items-center">
+
+        <div id="checkout_summary_container" class="w-75 position-absolute">
+            <table class="table">
+                <thead>
+                    <th>Movie</th>
+                    <th>Adult Tickets</th>
+                    <th>Childrens Tickets</th>
+                    <th>Total</th>
+                    <th></th>
+                </thead>
+                <tbody>
+                    <tr v-for="movie in ticketObject[0]">
+                        <td>hello</td>
+                        <td>hello</td>
+                        <td>hello</td>
+                        <td>hello</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="w-100 text-center">           
+            <div id="navbar" 
+                 class="w-50 bg-danger d-inline-block pl-2 pr-2 mt-2 rounded text-center">
+                <div id="ticket_top" 
+                     class="w-75 d-inline-block"></div>
+                <h1 class="text-center w-100 text-light">Ticket Town</h1>
+                <h6 class="text-center w-100 text-light">Present printoff or digital copies of these tickets at any Film Foyer location.</h6>
+                <h6 class="text-center w-100 text-light">Skip the line, order online!</h6>
+            </div>
+        </div>
+
+        <div id="movie_card_holder" 
+             class="d-flex justify-content-center align-items-center mt-1">
 
 
-            <div class="sidebars d-flex justify-content-center align-items-center" id="previous_button" v-on:click="previousSetOfMovies()"><h1 class="sidebar-text"><</h1></div>
+            <div class="sidebars d-flex justify-content-center align-items-center" 
+                 id="previous_button" 
+                 v-on:click="previousSetOfMovies()"><h1 class="sidebar-text"><</h1></div>
 
-            <div id="movie_card_holder" v-for="movie in currentMovies">
-                <div v-on:mouseover="mouseoverMovieCard($event)" id="panel_a" class="panels d-flex align-items-end">
-                    <p id="text_a" class="text-block p-2" v-bind:value="movie.overview" v-on:mouseover="mouseoverMovieCard($event)"></p>
-                    <div class="position-absolute p-2 buttons" id="buttons_a">
-                        <p class="d-inline-block btn btn-outline-light">Childrens Ticket: $5.99</p>
-                        <p class="d-inline-block btn btn-outline-light">Adults Ticket: $8.99</p>
+            <div v-for="(movie, index) in currentMovies" 
+                 :key="index">
+                <div v-on:mouseover="mouseoverMovieCard(index)" 
+                     v-on:mouseleave="mouseleaveMovieCard(index)" 
+                     v-bind:id="'panel_' + index" 
+                     class="d-flex align-items-end">
+                    <p v-bind:id="'text_header_' + index" 
+                        class="text-block-header p-2">{{currentMovies[index].title}}</p>
+                    <p v-bind:id="'text_' + index" 
+                        class="text-block p-2">{{currentMovies[index].overview}}</p>
+                    <div class="position-absolute p-2 panels buttons" 
+                         v-bind:id="'buttons_' + index">
+                        <p class="d-block btn btn-outline-light w-75 ml-auto mr-auto" 
+                            v-on:click="orderTicket(movie.title, 'childrens_ticket')">Childrens Ticket: ${{childrensTicketPrice}}</p>
+                        <p class="d-block btn btn-outline-light w-75 ml-auto mr-auto mt-1" 
+                            v-on:click="orderTicket(movie.title, 'adults_ticket')">Adults Ticket: ${{adultsTicketPrice}}</p>
                     </div>
-                    <img id="image_a" class="panel-image w-100" v-bind:src="'http://image.tmdb.org/t/p/w500' + movie.poster_path">        
+                    <img v-bind:id="'image_' + index" 
+                         class="panel-image w-100" 
+                         v-bind:src="'http://image.tmdb.org/t/p/w500' + movie.poster_path">        
                 </div>
             </div>
 
-            <div class="sidebars d-flex justify-content-center align-items-center" id="next_button" v-on:click="nextSetOfMovies()"><h1 class="sidebar-text">></h1></div>
+            <div class="sidebars d-flex justify-content-center align-items-center" 
+                 id="next_button" 
+                 v-on:click="nextSetOfMovies()"><h1 class="sidebar-text">></h1></div>
 
-
-        </div>        
+        </div>   
+        <div class="w-100 text-center">
+            
+            <div id="footer" 
+                 class="w-50 bg-danger d-inline-block pl-2 pr-2 mt-2 rounded text-center">
+                <div id="ticket_bottom" 
+                     class="w-75 d-inline-block"></div>
+            </div>
+            
+        </div>     
     </div>
     <script>
         const app = new Vue({
                 el: "#app",
                 data: {
+                    totalCost: 0,
+                    totalCostOfAdultTickets: 0,
+                    totalCostOfChildrenTickets: 0,
                     currentMovies: [],
-                    currentMoviesOffset: 0
+                    currentMoviesOffset: 0,
+                    childrensTicketPrice: 5.99,
+                    adultsTicketPrice: 8.99,
+                    ticketObject: [
+                        [],
+                        [],
+                        []
+                    ],
                 },
                 methods: {
-                    mouseoverMovieCard(movieCardId) {
-                        console.log(movieCardId.currentTarget.id)
+                    hoverCheckoutTab(hoverColor) {
+                        $(`#checkout_tab_arrow`).css("border-top-color",hoverColor);
+                        $(`#checkout_tab`).css("background",hoverColor);
+                    },
+                    mouseoverMovieCard(movieIndex) {
+                        $(`#image_${movieIndex}`).css("opacity",0.25);
+                        $(`#text_${movieIndex}`).css("opacity",1);
+                        $(`#text_header_${movieIndex}`).css("opacity",1);
+                        $(`#buttons_${movieIndex}`).css("opacity",1);
+                    },
+                    mouseleaveMovieCard(movieIndex) {
+                        $(`#image_${movieIndex}`).css("opacity",1);
+                        $(`#text_${movieIndex}`).css("opacity",0);
+                        $(`#text_header_${movieIndex}`).css("opacity",0);
+                        $(`#buttons_${movieIndex}`).css("opacity",0);
                     },
                     previousSetOfMovies() {
                         if (this.currentMoviesOffset > 0) {
@@ -106,17 +255,30 @@
                             this.currentMoviesOffset += 3
                             this.currentMovies = movies.responseJSON.results.slice(this.currentMoviesOffset, this.currentMoviesOffset+3);
                         }
-                        
+                    },
+                    orderTicket(movieTitle, type) {
+                        let movieIndex = this.ticketObject[0].indexOf(movieTitle);
+                        if (movieIndex != -1) {
+                            if (type === "childrens_ticket") {
+                                this.ticketObject[1][movieIndex] += 1;
+                            } else {
+                                this.ticketObject[2][movieIndex] += 1;
+                            }
+                        } else {
+                            this.ticketObject[0].push(movieTitle);
+                            if (type === "childrens_ticket") {
+                                this.ticketObject[1].push(1);
+                                this.ticketObject[2].push(0);
+                            } else {
+                                this.ticketObject[2].push(0);
+                                this.ticketObject[2].push(1);
+                            }
+                        }
+                        console.log(this.ticketObject)
                     }
                 }
         });
-        console.log(app._data.currentMovies)
-        var movieCardIds = [
-            ["panel_a", "panel_b", "panel_c"],
-            ["image_a", "image_b", "image_c"],
-            ["text_a", "text_b", "text_c"],
-            ["buttons_a", "buttons_b", "buttons_c"]
-        ]
+
         var request = "https://api.themoviedb.org/3/movie/76341?api_key=2adc1efea60bd3eefc285c12532c4ce8/discover/movie?primary_release_date.gte=2014-09-15&primary_release_date.lte=2014-10-22"
         request = "https://api.themoviedb.org/3/movie/now_playing?api_key=2adc1efea60bd3eefc285c12532c4ce8&language=en-US&page=1"
         var movies = $.get(request, function(response) {
@@ -127,78 +289,8 @@
             $("#image_c").attr("src","http://image.tmdb.org/t/p/w500/" + response.results[2].poster_path);
             $("#text_c").text(response.results[2].overview);
             app._data.currentMovies = response.results.slice(0,3);
-            console.log(app._data.currentMovies)
         });
 
-
-        $("#panel_a").mouseenter(function(){
-            $("#image_a").animate({
-                opacity: 0.25
-            },1000);
-            $("#text_a").animate({
-                opacity: 1
-            },1000);
-            $("#buttons_a").animate({
-                opacity: 1
-            },1000);
-        })
-        $("#panel_a").mouseleave(function(){
-            $("#image_a").animate({
-                opacity: 1
-            },1000);
-            $("#text_a").animate({
-                opacity: 0
-            },1000);
-            $("#buttons_a").animate({
-                opacity: 0
-            },1000);
-        })
-
-        $("#panel_b").mouseenter(function(){
-            $("#image_b").animate({
-                opacity: 0.25
-            },1000);
-            $("#text_b").animate({
-                opacity: 1
-            },1000);
-            $("#buttons_b").animate({
-                opacity: 1
-            },1000);
-        })
-        $("#panel_b").mouseleave(function(){
-            $("#image_b").animate({
-                opacity: 1
-            },1000);
-            $("#text_b").animate({
-                opacity: 0
-            },1000);
-            $("#buttons_b").animate({
-                opacity: 0
-            },1000);
-        })
-
-        $("#panel_c").mouseenter(function(){
-            $("#image_c").animate({
-                opacity: 0.25
-            },1000);
-            $("#text_c").animate({
-                opacity: 1
-            },1000);
-            $("#buttons_c").animate({
-                opacity: 1
-            },1000);
-        })
-        $("#panel_c").mouseleave(function(){
-            $("#image_c").animate({
-                opacity: 1
-            },1000);
-            $("#text_c").animate({
-                opacity: 0
-            },1000);
-            $("#buttons_c").animate({
-                opacity: 0
-            },1000);
-        })
 
     </script>
 </body>

@@ -4,150 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="stylesheet.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <title>The Film Foyer</title>
-    <style>
-        body {
-            background: black;
-        }
-
-        .panels {
-            width: 20%;
-        }
-        .sidebars {
-            width: 5%;
-            color: gray;
-            
-        }
-        .sidebars:hover {
-            color: white;
-        }
-        .sidebar-text {
-            font-family:'Courier New', Courier, monospace;
-            padding: 10px;
-            font-weight: bold;
-            font-size: 50px;
-        }
-        .panel-footer{
-            width: 100%;
-            height: 5vh;
-            position: absolute;
-            background-color: black;
-            opacity: 0.5;
-        }
-
-        .text-block {
-            position: absolute;
-            font-size: 0.8vw;
-            width: 20%;
-            top: 30vh;
-            z-index: 2;
-            color: white;
-            opacity: 0;
-        }
-
-        .text-block-header {
-            position: absolute;
-            font-size: 0.8vw;
-            width: 20%;
-            top: 28vh;
-            z-index: 2;
-            color: white;
-            opacity: 0;
-            font-weight: bold;
-        }
-
-        .buttons {
-            font-size: 0.8vw;
-            z-index: 3;
-            opacity: 0;
-        }
-
-        #movie_card_holder {
-            margin: auto;
-            width: 70vw;
-        }
-
-        #navbar {
-            border-bottom: black 10px dotted;
-        }
-
-        #footer {
-            height: 90px;
-        }
-
-        #ticket_top {
-            background: black;
-            height: 30px;
-            border-radius: 40%;
-            position: relative;
-            top: -15px;
-        }
-
-        #ticket_bottom {
-            background: black;
-            height: 30px;
-            border-radius: 40%;
-            position: relative;
-            top: 87%;
-        }
-
-        #app {
-            max-height: 90vh;
-        }
-
-        #checkout_tab {
-            width: 90px;
-            height: 40px;
-            background: #b38f00;
-            right: 30px;
-        }
-
-        #checkout_tab_arrow {
-            background: transparent;
-            right: 30px;
-            border-width: 45px 45px 45px 45px;
-            border-style: solid;
-            border-color: #b38f00 transparent transparent transparent;
-            top: 8px;
-            transform: scaleY(0.3);
-        }
-
-        #checkout_summary_container {
-            z-index: 5;
-            background: #b38f00;
-        }
-        
-    </style>
+    <title>Ticket Town</title>
 </head>
 <body>
     <div id="app">
         <div id="checkout_tab_container"
              v-on:mouseover="hoverCheckoutTab('#ffcc00')" 
-             v-on:mouseleave="hoverCheckoutTab('#b38f00')" >
+             v-on:mouseleave="hoverCheckoutTab('#b38f00')"
+             v-on:click="toggleCheckoutTable()">
             <div id="checkout_tab" class="position-absolute d-flex justify-content-center align-items-center">
                 <p class="text-light">Checkout</p>
             </div>
             <div id="checkout_tab_arrow" class="position-absolute"></div>
         </div>
 
-        <div id="checkout_summary_container" class="w-75 position-absolute">
-            <table class="table">
+        <div v-if="checkoutTableVisible" id="checkout_summary_container" class="d-flex justify-content-center align-items-center">
+            <table id="checkout_summary_table" class="table w-75 position-absolute bg-secondary table-hover">
                 <thead>
                     <th>Movie</th>
                     <th>Adult Tickets</th>
                     <th>Childrens Tickets</th>
                     <th>Total</th>
-                    <th></th>
+                    <th>Remove tickets</th>
                 </thead>
                 <tbody>
-                    <tr v-for="movie in ticketObject[0]">
-                        <td>hello</td>
-                        <td>hello</td>
-                        <td>hello</td>
-                        <td>hello</td>
+                    <tr v-if="Object.keys(ticketObject).length < 1">
+                        <td colspan="5" class="text-center">No tickets have been ordered yet</td>
+                    </tr>
+                    <tr v-for="(movie, index) in ticketObject" :key="index">
+                        <td>{{index}}</td>
+                        <td>{{movie.adults_tickets}} 
+                            <p class="bg-danger text-light remove-ticket-button rounded">-</p>
+                        </td>
+                        <td>{{movie.childrens_tickets}}</td>
+                        <td>${{(movie.childrens_tickets * childrensTicketPrice + movie.adults_tickets * adultsTicketPrice).toFixed(2)}}</td>
+                        <td><p class="btn btn-outline-white">Remove</p></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr v-if="totalCostOfAdultTickets > 0">
+                        <td>Total Cost of Adult Tickets</td>
+                        <td>${{(totalCostOfAdultTickets).toFixed(2)}}</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr v-if="totalCostOfChildrenTickets > 0">
+                        <td>Total Cost of Childrens Tickets</td>
+                        <td></td>
+                        <td>${{(totalCostOfChildrenTickets).toFixed(2)}}</td>
+                        <td></td>
+                    </tr>
+                    <tr v-if="totalCost > 0">
+                        <td>Total Cost of All Tickets</td>
+                        <td></td>
+                        <td></td>
+                        <td>${{(totalCost).toFixed(2)}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -185,9 +107,9 @@
                     <div class="position-absolute p-2 panels buttons" 
                          v-bind:id="'buttons_' + index">
                         <p class="d-block btn btn-outline-light w-75 ml-auto mr-auto" 
-                            v-on:click="orderTicket(movie.title, 'childrens_ticket')">Childrens Ticket: ${{childrensTicketPrice}}</p>
+                            v-on:click="orderTicket(movie.title, 1, 0)">Childrens Ticket: ${{childrensTicketPrice}}</p>
                         <p class="d-block btn btn-outline-light w-75 ml-auto mr-auto mt-1" 
-                            v-on:click="orderTicket(movie.title, 'adults_ticket')">Adults Ticket: ${{adultsTicketPrice}}</p>
+                            v-on:click="orderTicket(movie.title, 0, 1)">Adults Ticket: ${{adultsTicketPrice}}</p>
                     </div>
                     <img v-bind:id="'image_' + index" 
                          class="panel-image w-100" 
@@ -221,13 +143,17 @@
                     currentMoviesOffset: 0,
                     childrensTicketPrice: 5.99,
                     adultsTicketPrice: 8.99,
-                    ticketObject: [
-                        [],
-                        [],
-                        []
-                    ],
+                    ticketObject: {},
+                    checkoutTableVisible: false,
                 },
                 methods: {
+                    toggleCheckoutTable() {
+                        if (this.checkoutTableVisible) {
+                            this.checkoutTableVisible = false
+                        } else {
+                            this.checkoutTableVisible = true
+                        }
+                    },
                     hoverCheckoutTab(hoverColor) {
                         $(`#checkout_tab_arrow`).css("border-top-color",hoverColor);
                         $(`#checkout_tab`).css("background",hoverColor);
@@ -256,23 +182,20 @@
                             this.currentMovies = movies.responseJSON.results.slice(this.currentMoviesOffset, this.currentMoviesOffset+3);
                         }
                     },
-                    orderTicket(movieTitle, type) {
-                        let movieIndex = this.ticketObject[0].indexOf(movieTitle);
-                        if (movieIndex != -1) {
-                            if (type === "childrens_ticket") {
-                                this.ticketObject[1][movieIndex] += 1;
-                            } else {
-                                this.ticketObject[2][movieIndex] += 1;
-                            }
+                    orderTicket(movieTitle, additionalChildrensTickets, additionalAdultsTickets) {
+                        this.totalCostOfAdultTickets += additionalAdultsTickets * this.adultsTicketPrice;
+                        this.totalCostOfChildrenTickets += additionalChildrensTickets * this.childrensTicketPrice;
+                        this.totalCost += additionalAdultsTickets * this.adultsTicketPrice + additionalChildrensTickets * this.childrensTicketPrice;
+                        if (this.ticketObject[movieTitle]) {
+                            this.$set(this.ticketObject, movieTitle, {
+                                'childrens_tickets': this.ticketObject[movieTitle]['childrens_tickets'] + additionalChildrensTickets,
+                                'adults_tickets': this.ticketObject[movieTitle]['adults_tickets'] + additionalAdultsTickets
+                            })
                         } else {
-                            this.ticketObject[0].push(movieTitle);
-                            if (type === "childrens_ticket") {
-                                this.ticketObject[1].push(1);
-                                this.ticketObject[2].push(0);
-                            } else {
-                                this.ticketObject[2].push(0);
-                                this.ticketObject[2].push(1);
-                            }
+                            this.$set(this.ticketObject, movieTitle, {
+                                'childrens_tickets': additionalChildrensTickets,
+                                'adults_tickets': additionalAdultsTickets
+                            })
                         }
                         console.log(this.ticketObject)
                     }

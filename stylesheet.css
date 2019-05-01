@@ -1,0 +1,130 @@
+html body {
+    background: black;
+}
+
+.panels {
+    width: 20%;
+}
+.sidebars {
+    width: 5%;
+    color: gray;
+    
+}
+.sidebars:hover {
+    color: white;
+}
+.sidebar-text {
+    font-family:'Courier New', Courier, monospace;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 50px;
+}
+.panel-footer{
+    width: 100%;
+    height: 5vh;
+    position: absolute;
+    background-color: black;
+    opacity: 0.5;
+}
+
+.text-block {
+    position: absolute;
+    font-size: 0.8vw;
+    width: 20%;
+    top: 30vh;
+    z-index: 2;
+    color: white;
+    opacity: 0;
+}
+
+.text-block-header {
+    position: absolute;
+    font-size: 0.8vw;
+    width: 20%;
+    top: 28vh;
+    z-index: 2;
+    color: white;
+    opacity: 0;
+    font-weight: bold;
+}
+
+.buttons {
+    font-size: 0.8vw;
+    z-index: 3;
+    opacity: 0;
+}
+
+#movie_card_holder {
+    margin: auto;
+    width: 70vw;
+}
+
+#navbar {
+    border-bottom: black 10px dotted;
+}
+
+#footer {
+    height: 90px;
+}
+
+#ticket_top {
+    background: black;
+    height: 30px;
+    border-radius: 40%;
+    position: relative;
+    top: -15px;
+}
+
+#ticket_bottom {
+    background: black;
+    height: 30px;
+    border-radius: 40%;
+    position: relative;
+    top: 87%;
+}
+
+#app {
+    max-height: 90vh;
+}
+
+#checkout_tab {
+    width: 90px;
+    height: 40px;
+    background: #b38f00;
+    right: 30px;
+}
+
+#checkout_tab_arrow {
+    background: transparent;
+    right: 30px;
+    border-width: 45px 45px 45px 45px;
+    border-style: solid;
+    border-color: #b38f00 transparent transparent transparent;
+    top: 8px;
+    transform: scaleY(0.3);
+}
+
+#checkout_summary_container {
+    z-index: 4;
+    /* background: #b38f00; */
+}
+
+.table {
+    top: 20%;
+    z-index: 5;
+}
+
+.remove-ticket-button {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 1000;
+    padding-bottom: 3px;
+}
+
+.remove-ticket-button:hover {
+    background: white;
+    color: black;
+}

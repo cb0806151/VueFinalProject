@@ -31,7 +31,7 @@
             <table id="checkout_summary_table" class="table w-75 position-absolute">
                 <thead class="text-center">
                     <th>Movie</th>
-                    <th>Adult Tickets</th>
+                    <th>Adults Tickets</th>
                     <th>Childrens Tickets</th>
                     <th>Total</th>
                     <th>Remove tickets</th>
@@ -67,16 +67,16 @@
                     </tr>
                     <tr v-if="totalCostOfAdultTickets > 0">
                         <td>Total Cost of Adult Tickets</td>
+                        <td></td>
+                        <td></td>
                         <td class="text-center">${{(totalCostOfAdultTickets).toFixed(2)}}</td>
-                        <td></td>
-                        <td></td>
                         <td></td>
                     </tr>
                     <tr v-if="totalCostOfChildrenTickets > 0">
                         <td>Total Cost of Childrens Tickets</td>
                         <td></td>
-                        <td class="text-center">${{(totalCostOfChildrenTickets).toFixed(2)}}</td>
                         <td></td>
+                        <td class="text-center">${{(totalCostOfChildrenTickets).toFixed(2)}}</td>
                         <td></td>
                     </tr>
                     <tr v-if="totalCost > 0">
@@ -90,7 +90,7 @@
             </table>
         </div>
 
-        <div class="w-100 text-center">           
+        <div class="w-100 text-center">        
             <div id="navbar" 
                  class="w-50 bg-danger d-inline-block pl-2 pr-2 mt-2 rounded text-center">
                 <div id="ticket_top" 
@@ -147,109 +147,6 @@
             
         </div>     
     </div>
-    <script>
-
-        var request = "https://api.themoviedb.org/3/movie/76341?api_key=2adc1efea60bd3eefc285c12532c4ce8/discover/movie?primary_release_date.gte=2014-09-15&primary_release_date.lte=2014-10-22"
-        request = "https://api.themoviedb.org/3/movie/now_playing?api_key=2adc1efea60bd3eefc285c12532c4ce8&language=en-US&page=1"
-        var movies = $.get(request, function(response) {
-            $("#image_a").attr("src","http://image.tmdb.org/t/p/w500/" + response.results[0].poster_path);
-            $("#text_a").text(response.results[0].overview);
-            $("#image_b").attr("src","http://image.tmdb.org/t/p/w500/" + response.results[1].poster_path);
-            $("#text_b").text(response.results[1].overview);
-            $("#image_c").attr("src","http://image.tmdb.org/t/p/w500/" + response.results[2].poster_path);
-            $("#text_c").text(response.results[2].overview);
-            app._data.currentMovies = response.results.slice(0,3);
-        });
-
-        const app = new Vue({
-                el: "#app",
-                data: {
-                    totalCost: 0,
-                    totalCostOfAdultTickets: 0,
-                    totalCostOfChildrenTickets: 0,
-                    currentMovies: [],
-                    currentMoviesOffset: 0,
-                    childrensTicketPrice: 5.99,
-                    adultsTicketPrice: 8.99,
-                    ticketObject: {},
-                    checkoutTableVisible: false,
-                },
-                methods: {
-                    removeMoviesTickets(movieTitle) {
-                        this.totalCost -= this.childrensTicketPrice * this.ticketObject[movieTitle]['childrens_tickets'];
-                        this.totalCostOfChildrenTickets -= this.childrensTicketPrice * this.ticketObject[movieTitle]['childrens_tickets'];
-                        this.totalCost -= this.adultsTicketPrice * this.ticketObject[movieTitle]['adults_tickets'];
-                        this.totalCostOfAdultTickets -= this.adultsTicketPrice * this.ticketObject[movieTitle]['adults_tickets'];
-                        this.$delete(this.ticketObject, movieTitle);
-                    },
-                    removeTicket(movieTitle, ticketCategory) {
-                        if (ticketCategory === "childrens_tickets") {
-                            this.totalCost -= this.childrensTicketPrice;
-                            this.totalCostOfChildrenTickets -= this.childrensTicketPrice;
-                        } else {
-                            this.totalCost -= this.adultsTicketPrice;
-                            this.totalCostOfAdultTickets -= this.adultsTicketPrice;
-                        }
-
-                        this.ticketObject[movieTitle][ticketCategory] -= 1
-                        if (this.ticketObject[movieTitle]['childrens_tickets'] < 1 && this.ticketObject[movieTitle]['adults_tickets'] < 1) {
-                            this.$delete(this.ticketObject, movieTitle);
-                        }
-                    },
-                    toggleCheckoutTable() {
-                        if (this.checkoutTableVisible) {
-                            this.checkoutTableVisible = false
-                        } else {
-                            this.checkoutTableVisible = true
-                        }
-                    },
-                    hoverCheckoutTab(hoverColor) {
-                        $(`#checkout_tab_arrow`).css("border-top-color",hoverColor);
-                        $(`#checkout_tab`).css("background",hoverColor);
-                    },
-                    mouseoverMovieCard(movieIndex) {
-                        $(`#image_${movieIndex}`).css("opacity",0.25);
-                        $(`#text_${movieIndex}`).css("opacity",1);
-                        $(`#text_header_${movieIndex}`).css("opacity",1);
-                        $(`#buttons_${movieIndex}`).css("opacity",1);
-                    },
-                    mouseleaveMovieCard(movieIndex) {
-                        $(`#image_${movieIndex}`).css("opacity",1);
-                        $(`#text_${movieIndex}`).css("opacity",0);
-                        $(`#text_header_${movieIndex}`).css("opacity",0);
-                        $(`#buttons_${movieIndex}`).css("opacity",0);
-                    },
-                    previousSetOfMovies() {
-                        if (this.currentMoviesOffset > 0) {
-                            this.currentMoviesOffset -= 3
-                            this.currentMovies = movies.responseJSON.results.slice(this.currentMoviesOffset, this.currentMoviesOffset+3);
-                        }
-                    },
-                    nextSetOfMovies() {
-                        if (this.currentMoviesOffset + 3 < movies.responseJSON.results.length) {
-                            this.currentMoviesOffset += 3
-                            this.currentMovies = movies.responseJSON.results.slice(this.currentMoviesOffset, this.currentMoviesOffset+3);
-                        }
-                    },
-                    orderTicket(movieTitle, additionalChildrensTickets, additionalAdultsTickets) {
-                        this.totalCostOfAdultTickets += additionalAdultsTickets * this.adultsTicketPrice;
-                        this.totalCostOfChildrenTickets += additionalChildrensTickets * this.childrensTicketPrice;
-                        this.totalCost += additionalAdultsTickets * this.adultsTicketPrice + additionalChildrensTickets * this.childrensTicketPrice;
-                        if (this.ticketObject[movieTitle]) {
-                            this.$set(this.ticketObject, movieTitle, {
-                                'childrens_tickets': this.ticketObject[movieTitle]['childrens_tickets'] + additionalChildrensTickets,
-                                'adults_tickets': this.ticketObject[movieTitle]['adults_tickets'] + additionalAdultsTickets
-                            })
-                        } else {
-                            this.$set(this.ticketObject, movieTitle, {
-                                'childrens_tickets': additionalChildrensTickets,
-                                'adults_tickets': additionalAdultsTickets
-                            })
-                        }
-                        console.log(this.ticketObject)
-                    }
-                }
-        });
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
